@@ -119,8 +119,6 @@ a, b, r, w = A1[0], A1[1], A1[2], A1[3]
 # 把测试数据整理为最小二乘法方程的矩阵形式
 length2 = length - fit_num
 T2 = np.array([i for i in range(0, length2, INTERVAL)])
-Z2 = np.zeros((length2, 1))
-O2 = np.ones((length2, 1))
 S2 = np.expand_dims(np.array(S2), axis=1)
 E2 = np.expand_dims(np.array(E2), axis=1)
 I2 = np.expand_dims(np.array(I2), axis=1)
@@ -129,22 +127,11 @@ dS2 = np.expand_dims(np.array(dS2), axis=1)
 dE2 = np.expand_dims(np.array(dE2), axis=1)
 dI2 = np.expand_dims(np.array(dI2), axis=1)
 dR2 = np.expand_dims(np.array(dR2), axis=1)
-tmpA = np.c_[Z2, -I2*S2/N, Z2, Z2]
-tmpB = np.c_[-E2, I2*S2/N, Z2, O2]
-tmpC = np.c_[E2, Z2, -I2, Z2]
-tmpD = np.c_[Z2, Z2, I2, Z2]
-X2 = np.r_[tmpA, tmpB, tmpC, tmpD]
 
-Y2_pred = X2.dot(A1) # 计算出估计的微分值
-dS2_pred = Y2_pred[:length2, :]
-dE2_pred = Y2_pred[length2:length2*2, :]
-dI2_pred = Y2_pred[length2*2:length2*3, :]
-dR2_pred = Y2_pred[length2*3:, :]
-
-# 根据估计出的微分值，结合模型公式，反算出估计出的S I E
-I2_pred = dR2_pred / r
-E2_pred = (dI2_pred + dR2_pred) / a
-S2_pred = (-N * dS2_pred) / (b * I2_pred)
+# 根据模型公式，反算出估计出的S I E
+I2_pred = dR2 / r
+E2_pred = (dI2 + dR2) / a
+S2_pred = (-N * dS2) / (b * I2)
 
 # 真实的S I E与估计的S I E做评价
 print('\n\n')
@@ -153,7 +140,7 @@ print("MSE of S:", mean_squared_error(S2, S2_pred))
 print("MSE of I:", mean_squared_error(I2, I2_pred))
 print("MSE of E:", mean_squared_error(E2, E2_pred))
 
-# plt.plot(S2, S2, label="real S")
-# plt.plot(S2, S2_pred, label="pred S")
-# plt.legend()
+plt.plot(T2, S2, label="real S")
+plt.plot(T2, S2_pred, label="pred S")
+plt.legend()
 # plt.show()
